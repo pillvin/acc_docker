@@ -18,11 +18,11 @@
 #
 # Pull base image
 # ---------------
-FROM debian:stretch
+FROM ubuntu:18.04
 
 # Maintainer
 # ----------
-MAINTAINER jordy@adobe.com
+MAINTAINER pillvin@iit.edu
 
 
 # Build to install 
@@ -45,9 +45,41 @@ ENV CAMPAIGN_INTERNAL_PASSWORD_VAR neo
 # ----------------------
 RUN apt-get update \
  	&& apt-get upgrade -y  \
-	&& apt-get install -y apt-utils systemd-container unixodbc mlocate curl vim wget apache2 telnet elinks openssh-server bc libicu57 libprotobuf10 libcurl3 libc-ares2 openjdk-8-jdk phantomjs postgresql-client postgresql locales openssl \
-    && apt-get clean all \
+ 	&& apt remove libssl1.1 -y \
+ 	&& apt remove libssl1.0.0 -y \
+	&& echo 'tzdata tzdata/Areas select Europe' | debconf-set-selections \
+	&& echo 'tzdata tzdata/Zones/Europe select Paris' | debconf-set-selections \
+	&& DEBIAN_FRONTEND="noninteractive" apt install -y tzdata \
+	&& apt-get install -y apt-utils systemd-container 
+
+RUN apt install -y wget \
+	&& wget http://launchpadlibrarian.net/317614660/libicu57_57.1-6_amd64.deb \
+ 	&& apt install ./libicu57_57.1-6_amd64.deb -y \
+  	&& wget http://launchpadlibrarian.net/362321150/libssl1.0.0_1.0.2n-1ubuntu5_amd64.deb \
+  	&& apt install ./libssl1.0.0_1.0.2n-1ubuntu5_amd64.deb -y  --allow-downgrades  \
+  	&& wget http://security.ubuntu.com/ubuntu/pool/main/o/openssl1.0/libssl1.0-dev_1.0.2n-1ubuntu5_amd64.deb \
+ 	&& apt install ./libssl1.0-dev_1.0.2n-1ubuntu5_amd64.deb -y --allow-downgrades
+
+
+
+RUN	apt install -y unixodbc wget bzip2 mlocate vim wget apache2 telnet elinks openssh-server bc libicu-dev protobuf-compiler libcurl3 libc-ares2 openjdk-8-jdk postgresql-client postgresql locales openssl \
+    && apt-get install build-essential chrpath libxft-dev -y \
+	&& apt-get install libfreetype6 libfreetype6-dev -y \
+	&& apt-get install libfontconfig1 libfontconfig1-dev -y 
+
+# COPY sources/openssl.cnf /etc/ssl	
+
+RUN	cd ~ \
+	&& export PHANTOM_JS="phantomjs-2.1.1-linux-x86_64" \
+	&& wget https://github.com/Medium/phantomjs/releases/download/v2.1.1/$PHANTOM_JS.tar.bz2 \
+	&& tar xvjf $PHANTOM_JS.tar.bz2 \
+	&& mv $PHANTOM_JS /usr/local/share \
+	&& ln -sf /usr/local/share/$PHANTOM_JS/bin/phantomjs /usr/local/bin \
+	&& phantomjs --version \
+	&& apt-get clean all \
 	&& rm -rf /var/lib/apt/lists/* 
+
+
 
 #Locales
 # ----------------------
@@ -63,8 +95,8 @@ RUN chmod a+x /*.sh &&\
 
 # PostgreSQL configuration
 # ------------------------
-RUN sed -i -e "s/^[# ]*\\(listen_addresses[ ]*=[ ]*'\\)[^']*\\('.*\\)$/\\1*\\2/" /etc/postgresql/9.6/main/postgresql.conf &&\
-	sed -i 's/peer/trust/g' /etc/postgresql/9.6/main/pg_hba.conf
+RUN sed -i -e "s/^[# ]*\\(listen_addresses[ ]*=[ ]*'\\)[^']*\\('.*\\)$/\\1*\\2/" /etc/postgresql/10/main/postgresql.conf &&\
+	sed -i 's/peer/trust/g' /etc/postgresql/10/main/pg_hba.conf
 
 RUN service postgresql start &&\
 	su postgres -c "createuser -d -r -s root" &&\
