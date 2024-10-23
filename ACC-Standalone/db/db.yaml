@@ -5,8 +5,6 @@ services:
     container_name: medtrain
     # set shared memory limit when using docker-compose
     shm_size: 128mb
-    ports:
-      - "5432:5432"
     volumes:
       - "./create.ddl:/tmp/create.ddl"
       - "./master_data.sql:/tmp/master_data.sql"
@@ -15,8 +13,4 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: adobe
-    networks:
-      - app-network
-networks:
-  app-network:
-    driver: bridge
+    network_mode: host
