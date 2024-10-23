@@ -1,0 +1,22 @@
+services:
+  db:
+    image: postgres:16.4
+    restart: always
+    container_name: medtrain
+    # set shared memory limit when using docker-compose
+    shm_size: 128mb
+    ports:
+      - "5432:5432"
+    volumes:
+      - "./create.ddl:/tmp/create.ddl"
+      - "./master_data.sql:/tmp/master_data.sql"
+      -  "./init.sql:/docker-entrypoint-initdb.d/init.sql"
+      -  "./.db:/var/lib/postgresql/data"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: adobe
+    networks:
+      - app-network
+networks:
+  app-network:
+    driver: bridge
