@@ -55,12 +55,8 @@ RUN apt-get update \
 RUN apt install -y wget \
 	&& wget http://launchpadlibrarian.net/317614660/libicu57_57.1-6_amd64.deb \
  	&& apt install ./libicu57_57.1-6_amd64.deb -y \
-  	&& wget http://launchpadlibrarian.net/362321150/libssl1.0.0_1.0.2n-1ubuntu5_amd64.deb \
-  	&& apt install ./libssl1.0.0_1.0.2n-1ubuntu5_amd64.deb -y  --allow-downgrades  \
-  	&& wget http://security.ubuntu.com/ubuntu/pool/main/o/openssl1.0/libssl1.0-dev_1.0.2n-1ubuntu5_amd64.deb \
- 	&& apt install ./libssl1.0-dev_1.0.2n-1ubuntu5_amd64.deb -y --allow-downgrades
-
-
+  	&& wget https://debian.sipwise.com/debian-security/pool/main/o/openssl1.0/libssl1.0.2_1.0.2u-1~deb9u2_amd64.deb \
+	&& apt install ./libssl1.0.2_1.0.2u-1~deb9u2_amd64.deb -y --allow-downgrades
 
 RUN	apt install -y unixodbc wget bzip2 mlocate vim wget apache2 telnet elinks openssh-server bc libicu-dev protobuf-compiler libcurl3 libc-ares2 openjdk-8-jdk postgresql-client postgresql locales openssl \
     && apt-get install build-essential chrpath libxft-dev -y \
@@ -79,17 +75,15 @@ RUN	cd ~ \
 	&& apt-get clean all \
 	&& rm -rf /var/lib/apt/lists/* 
 
-
-
 #Locales
 # ----------------------
 RUN sed -i 's/# en_US ISO-8859-1/en_US ISO-8859-1/' /etc/locale.gen && sed -i 's/# en_US.ISO-8859-15 ISO-8859-15/en_US.ISO-8859-15 ISO-8859-15/' /etc/locale.gen && sed -i 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && locale-gen
 
-
 # Campaign installer and configuration scripts
 # --------------------------------------------
 COPY acc_install.sh apache.sh monitor.sh acc_start.sh setup_instance.js /
-COPY sources /sources
+COPY sources/ext /sources
+COPY sources/dist/ubuntu/v9/nlserver6-v7-9364-amd64_deb9.deb /sources
 RUN chmod a+x /*.sh &&\
 	chmod a+x /*.js
 
@@ -124,21 +118,21 @@ RUN /apache.sh
 
 # Snowflake FDA
 # -----------------------------------------------------
-RUN /usr/local/neolane/nl6/bin/fda-setup-scripts/snowflake_odbc-setup.sh
+# RUN /usr/local/neolane/nl6/bin/fda-setup-scripts/snowflake_odbc-setup.sh
 
 # Google Big Query FDA 
 # -----------------------------------------------------
-RUN /usr/local/neolane/nl6/bin/fda-setup-scripts/bigquery_odbc-setup.sh
+# RUN /usr/local/neolane/nl6/bin/fda-setup-scripts/bigquery_odbc-setup.sh
 #RUN /usr/local/neolane/nl6/bin/fda-setup-scripts/bigquery_sdk-setup.sh
 
 # DB Analyser plugin (optional)
 # -----------------------------
-COPY /sources/dbanalyser/ /usr/local/neolane/nl6/web/dbanalyser
-COPY /sources/dbajssp /usr/local/neolane/nl6/datakit/xtk/eng/jssp/
+COPY /sources/ext/dbanalyser /usr/local/neolane/nl6/web/dbanalyser
+COPY /sources/ext/dbajssp /usr/local/neolane/nl6/datakit/xtk/eng/jssp
 
 # Client console availability
 # ---------------------------
-COPY /sources/setup-*.exe /usr/local/neolane/nl6/datakit/nl/eng/jsp/
+COPY /sources/dist/setup-*.exe /usr/local/neolane/nl6/datakit/nl/eng/jsp/
 
 # Default neolane user rights
 # ---------------------------
