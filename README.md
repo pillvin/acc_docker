@@ -22,6 +22,9 @@ Overall communication between the processes is carried out according to the foll
 
 <img src="https://github.com/adobe/acc_docker/blob/master/images/standalone.png" width="600">
 
+## Download Adobe Campaign Classic Client (for Windows)
+[Download](http://localhost:8080/nl/jsp/setup-client-7.0.9346.exe)
+
 ## Campaign packages
 Installed packages are: 
 - Delivery
