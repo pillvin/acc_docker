@@ -14,11 +14,11 @@ sed -i '$a\\' ~/.bashrc
 sed -i '$a\#Adobe Campaign Configuration' ~/.bashrc
 sed -i '$a\export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/neolane/nl6/lib' ~/.bashrc
 sed -i '$a\export PATH=$PATH:/usr/local/neolane/nl6/bin' ~/.bashrc
-sed -i '$a\export LD_LIBRARY_PATH=/usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64:$LD_LIBRARY_PATH' ~/.bashrc
+sed -i '$a\export LD_LIBRARY_PATH=/usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64:/usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64/server:$LD_LIBRARY_PATH' ~/.bashrc
 
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/neolane/nl6/lib
 export PATH=$PATH:/usr/local/neolane/nl6/bin
-export LD_LIBRARY_PATH=/usr/local/neolane/nl6/lib/:/usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64/:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=/usr/local/neolane/nl6/lib/:/usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64/:/usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64/server:$LD_LIBRARY_PATH
 
 # Start PostgreSQL
 # ---------------------
