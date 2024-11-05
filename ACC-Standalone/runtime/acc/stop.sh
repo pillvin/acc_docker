@@ -5,5 +5,7 @@
 # Description: 
 #    - Stop docker acc_standalone
 
-docker stop acc_standalone 
+# docker stop acc_standalone 
+docker-compose down
+
 docker ps -a 

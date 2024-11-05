@@ -1,0 +1,14 @@
+{
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 5432,
+            "driver": "PostgreSQL",
+            "name": "acc_postgres",
+            "database": "neolane_db",
+            "username": "neolane_user",
+            "password": "neolane_pwd"
+        }
+    ]
+}
