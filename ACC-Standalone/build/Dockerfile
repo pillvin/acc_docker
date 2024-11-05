@@ -24,6 +24,7 @@ FROM ubuntu:18.04
 # ----------
 MAINTAINER pillvin@iit.edu
 
+WORKDIR /root/acc-install
 
 # Build to install 
 # ---------------------------------------------
@@ -81,11 +82,12 @@ RUN sed -i 's/# en_US ISO-8859-1/en_US ISO-8859-1/' /etc/locale.gen && sed -i 's
 
 # Campaign installer and configuration scripts
 # --------------------------------------------
-COPY acc_install.sh apache.sh monitor.sh acc_start.sh setup_instance.js /
-COPY sources/ext /sources
-COPY sources/dist/ubuntu/v9/nlserver6-v7-9364-amd64_deb9.deb /sources
-RUN chmod a+x /*.sh &&\
-	chmod a+x /*.js
+COPY acc_install.sh apache.sh monitor.sh acc_start.sh setup_instance.js ./
+COPY sources/ext ./sources
+COPY sources/dist/ubuntu/v9/nlserver6-v7-9364-amd64_deb9.deb ./sources
+RUN chmod a+x ./*.sh &&\
+	chmod a+x ./*.js &&\
+	chmod 755 /root
 
 # PostgreSQL configuration
 # ------------------------
@@ -102,8 +104,8 @@ RUN service postgresql start &&\
 
 # Campaign installation & configuration
 # -------------------------------------
-RUN dpkg -i /sources/$BUILD 
-RUN /acc_install.sh 
+RUN dpkg -i ./sources/$BUILD 
+RUN ./acc_install.sh 
 
 RUN service postgresql start &&\
 	export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/neolane/nl6/lib &&\
@@ -114,7 +116,7 @@ RUN service postgresql start &&\
 
 # Apache configuration (port 80 and 443)
 # --------------------------------------
-RUN /apache.sh 
+RUN ./apache.sh 
 
 # Snowflake FDA
 # -----------------------------------------------------
@@ -150,4 +152,4 @@ EXPOSE 22
 
 # Default script to start Campaign + Apache + PostgreSQL
 # ------------------------------------------------------
-ENTRYPOINT /acc_start.sh
+ENTRYPOINT ./acc_start.sh
