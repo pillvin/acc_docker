@@ -1,0 +1,1 @@
+docker load < ./images/acc_standalone.tar.gz
