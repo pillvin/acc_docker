@@ -42,7 +42,7 @@ ENV INSTANCE acc1
 ENV CAMPAIGN_ADMIN_PASSWORD_VAR neo 
 ENV CAMPAIGN_INTERNAL_PASSWORD_VAR neo 
 
-# Debian 9 prerequisites 
+# prerequisites 
 # ----------------------
 RUN apt-get update \
  	&& apt-get upgrade -y  \
