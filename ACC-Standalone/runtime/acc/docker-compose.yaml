@@ -3,5 +3,5 @@ services:
     image: acc_standalone:latest
     platform: linux/amd64
     restart: always
-    container_name: acc
+    container_name: acc_standalone
     network_mode: host
