@@ -113,7 +113,7 @@ RUN sed -i 's/# en_US ISO-8859-1/en_US ISO-8859-1/' /etc/locale.gen && sed -i 's
 # --------------------------------------------
 COPY acc_install.sh apache.sh monitor.sh acc_start.sh setup_instance.js ./
 COPY sources/ext ./sources
-COPY sources/dist/ubuntu/v20.04/nlserver6-v7-9383-amd64_deb11.deb ./sources
+COPY sources/dist/ubuntu/v22.04/nlserver6-v7-9383-amd64_deb11.deb ./sources
 RUN chmod a+x ./*.sh &&\
 	chmod a+x ./*.js &&\
 	chmod 755 /root
