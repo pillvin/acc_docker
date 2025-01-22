@@ -18,7 +18,9 @@
 #
 # Pull base image
 # ---------------
-FROM ubuntu:18.04
+# Ubuntu 20.04 = Debian 11 
+# (https://askubuntu.com/questions/445487/what-debian-version-are-the-different-ubuntu-versions-based-on)
+FROM ubuntu:22.04
 
 # Maintainer
 # ----------
@@ -46,25 +48,52 @@ ENV CAMPAIGN_INTERNAL_PASSWORD_VAR neo
 # ----------------------
 RUN apt-get update \
  	&& apt-get upgrade -y  \
- 	&& apt remove libssl1.1 -y \
- 	&& apt remove libssl1.0.0 -y \
+ 	# && apt remove libssl1.1 -y \
+ 	# && apt remove libssl1.0.0 -y \
 	&& echo 'tzdata tzdata/Areas select Europe' | debconf-set-selections \
 	&& echo 'tzdata tzdata/Zones/Europe select Paris' | debconf-set-selections \
 	&& DEBIAN_FRONTEND="noninteractive" apt install -y tzdata \
 	&& apt-get install -y apt-utils systemd-container 
 
-RUN apt install -y wget \
-	&& wget http://launchpadlibrarian.net/317614660/libicu57_57.1-6_amd64.deb \
- 	&& apt install ./libicu57_57.1-6_amd64.deb -y \
-  	&& wget https://debian.sipwise.com/debian-security/pool/main/o/openssl1.0/libssl1.0.2_1.0.2u-1~deb9u2_amd64.deb \
-	&& apt install ./libssl1.0.2_1.0.2u-1~deb9u2_amd64.deb -y --allow-downgrades
+# ubuntu v18.04
+# RUN apt install -y wget \
+# 	&& wget http://launchpadlibrarian.net/317614660/libicu57_57.1-6_amd64.deb \
+#  	&& apt install ./libicu57_57.1-6_amd64.deb -y \
+#   	&& wget https://debian.sipwise.com/debian-security/pool/main/o/openssl1.0/libssl1.0.2_1.0.2u-1~deb9u2_amd64.deb \
+# 	&& apt install ./libssl1.0.2_1.0.2u-1~deb9u2_amd64.deb -y --allow-downgrades
 
-RUN	apt install -y unixodbc wget bzip2 mlocate vim wget apache2 telnet elinks openssh-server bc libicu-dev protobuf-compiler libcurl3 libc-ares2 openjdk-8-jdk postgresql-client postgresql locales openssl \
+# ubuntu 20.04
+# RUN apt install -y wget \
+# 	&& wget http://ftp.us.debian.org/debian/pool/main/i/icu/libicu67_67.1-7_amd64.deb \
+# 	&& apt install ./libicu67_67.1-7_amd64.deb \
+# 	&& wget http://ftp.us.debian.org/debian/pool/main/g/glibc/libc6_2.40-5_amd64.deb \
+# 	&& apt install ./libc6_2.40-5_amd64.deb \
+# 	&& wget http://ftp.us.debian.org/debian/pool/main/p/pcre2/libpcre2-16-0_10.44-5_amd64.deb \
+# 	&& apt install ./libpcre2-16-0_10.44-5_amd64.deb \
+# 	&& wget http://ftp.us.debian.org/debian/pool/main/x/xalan/libxalan-c112_1.12-6_amd64.deb \
+# 	&& apt install ./libxalan-c112_1.12-6_amd64.deb
+
+
+# ubuntu 22.04
+RUN apt install -y wget \
+	&& wget http://ftp.us.debian.org/debian/pool/main/i/icu/libicu67_67.1-7_amd64.deb \
+	&& apt install ./libicu67_67.1-7_amd64.deb \
+	&& wget http://ftp.us.debian.org/debian/pool/main/p/pcre2/libpcre2-16-0_10.44-5_amd64.deb \
+	&& apt install ./libpcre2-16-0_10.44-5_amd64.deb \
+	&& wget http://ftp.us.debian.org/debian/pool/main/x/xerces-c/libxerces-c3.2_3.2.3+debian-3+deb11u1_amd64.deb \
+	&& apt install ./libxerces-c3.2_3.2.3+debian-3+deb11u1_amd64.deb \
+	&& wget http://ftp.us.debian.org/debian/pool/main/x/xalan/libxalan-c112_1.12-6_amd64.deb \
+	&& apt install ./libxalan-c112_1.12-6_amd64.deb \
+	&& wget http://security.debian.org/debian-security/pool/updates/main/o/openssl/libssl1.1_1.1.1w-0+deb11u2_amd64.deb \
+	&& apt install ./libssl1.1_1.1.1w-0+deb11u2_amd64.deb 
+
+# ubuntu v18.04 => libcurl3 openjdk-8-jdk
+RUN	apt install -y unixodbc wget bzip2 mlocate vim wget apache2 telnet elinks openssh-server bc libicu-dev protobuf-compiler  libc-ares2 openjdk-11-jdk-headless postgresql-client postgresql locales openssl xvfb \
     && apt-get install build-essential chrpath libxft-dev -y \
 	&& apt-get install libfreetype6 libfreetype6-dev -y \
 	&& apt-get install libfontconfig1 libfontconfig1-dev -y 
 
-# COPY sources/openssl.cnf /etc/ssl	
+COPY sources/openssl.cnf /etc/ssl	
 
 RUN	cd ~ \
 	&& export PHANTOM_JS="phantomjs-2.1.1-linux-x86_64" \
@@ -84,15 +113,15 @@ RUN sed -i 's/# en_US ISO-8859-1/en_US ISO-8859-1/' /etc/locale.gen && sed -i 's
 # --------------------------------------------
 COPY acc_install.sh apache.sh monitor.sh acc_start.sh setup_instance.js ./
 COPY sources/ext ./sources
-COPY sources/dist/ubuntu/v9/nlserver6-v7-9364-amd64_deb9.deb ./sources
+COPY sources/dist/ubuntu/v20.04/nlserver6-v7-9383-amd64_deb11.deb ./sources
 RUN chmod a+x ./*.sh &&\
 	chmod a+x ./*.js &&\
 	chmod 755 /root
 
 # PostgreSQL configuration
 # ------------------------
-RUN sed -i -e "s/^[# ]*\\(listen_addresses[ ]*=[ ]*'\\)[^']*\\('.*\\)$/\\1*\\2/" /etc/postgresql/10/main/postgresql.conf &&\
-	sed -i 's/peer/trust/g' /etc/postgresql/10/main/pg_hba.conf
+RUN sed -i -e "s/^[# ]*\\(listen_addresses[ ]*=[ ]*'\\)[^']*\\('.*\\)$/\\1*\\2/" /etc/postgresql/14/main/postgresql.conf &&\
+	sed -i 's/peer/trust/g' /etc/postgresql/14/main/pg_hba.conf
 
 RUN service postgresql start &&\
 	su postgres -c "createuser -d -r -s root" &&\
